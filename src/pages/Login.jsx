@@ -11,36 +11,53 @@ export default function Login() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-
     setLoading(true);
 
-    // fake delay (backend pore add korbo)
     setTimeout(() => {
-      if (email === "admin@gmail.com" && password === "1234") {
-        localStorage.setItem("token", "fake-token");
+      const users = JSON.parse(localStorage.getItem("users")) || [];
+
+      // 🔥 Find user
+      const user = users.find(
+        (u) => u.email === email && u.password === password
+      );
+
+      if (!user) {
+        alert("Invalid email or password ❌");
+        setLoading(false);
+        return;
+      }
+
+      // 🔥 Save current user
+      localStorage.setItem("currentUser", JSON.stringify(user));
+
+      // 🔥 Role-based redirect
+      if (user.role === "admin") {
         navigate("/dashboard");
       } else {
-        alert("Invalid credentials");
+        navigate("/home");
       }
+
       setLoading(false);
-    }, 1000);
+    }, 800);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white shadow-lg rounded-2xl p-8 w-[350px]">
-        
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600">
+
+      <div className="bg-white/20 backdrop-blur-lg shadow-xl rounded-2xl p-8 w-[350px] text-white">
+
         <h2 className="text-2xl font-bold text-center mb-6">
-          Shop Login
+          Welcome Back 👋
         </h2>
 
         <form onSubmit={handleLogin}>
+
           {/* Email */}
           <div className="mb-4">
             <label className="text-sm">Email</label>
             <input
               type="email"
-              className="w-full border rounded-lg p-2 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full p-2 mt-1 rounded bg-white/30 placeholder-white outline-none"
               placeholder="Enter email"
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -49,16 +66,18 @@ export default function Login() {
           {/* Password */}
           <div className="mb-4">
             <label className="text-sm">Password</label>
+
             <div className="relative">
               <input
                 type={showPass ? "text" : "password"}
-                className="w-full border rounded-lg p-2 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full p-2 mt-1 rounded bg-white/30 placeholder-white outline-none"
                 placeholder="Enter password"
                 onChange={(e) => setPassword(e.target.value)}
               />
+
               <span
                 onClick={() => setShowPass(!showPass)}
-                className="absolute right-2 top-2 cursor-pointer text-sm text-gray-500"
+                className="absolute right-2 top-2 cursor-pointer text-sm"
               >
                 {showPass ? "Hide" : "Show"}
               </span>
@@ -67,12 +86,33 @@ export default function Login() {
 
           {/* Button */}
           <button
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg transition"
+            className="w-full bg-black py-2 rounded hover:bg-gray-800 transition"
           >
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
+
+        {/* 🔗 Links */}
+        <div className="flex justify-between mt-4 text-sm">
+
+          <span
+            onClick={() => navigate("/forgot")}
+            className="cursor-pointer underline"
+          >
+            Forgot Password?
+          </span>
+
+          <span
+            onClick={() => navigate("/register")}
+            className="cursor-pointer underline"
+          >
+            Register
+          </span>
+
+        </div>
+
       </div>
+
     </div>
   );
 }

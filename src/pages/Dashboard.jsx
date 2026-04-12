@@ -31,23 +31,7 @@ export default function Dashboard() {
     <div className="flex min-h-screen bg-gray-100">
 
       {/* Sidebar */}
-      <div className="w-64 bg-white shadow-lg p-5">
-        <h2 className="text-xl font-bold mb-6">E-commerce Admin</h2>
-
-        <ul className="space-y-3">
-          <li className="hover:text-blue-500 cursor-pointer">Dashboard</li>
-          <li className="hover:text-blue-500 cursor-pointer">Products</li>
-          <li className="hover:text-blue-500 cursor-pointer">Orders</li>
-          <li className="hover:text-blue-500 cursor-pointer">Customers</li>
-        </ul>
-
-        <button
-          onClick={handleLogout}
-          className="mt-10 bg-red-500 text-white px-4 py-2 rounded-lg w-full"
-        >
-          Logout
-        </button>
-      </div>
+      
 
       {/* Main */}
       <div className="flex-1 p-6">
