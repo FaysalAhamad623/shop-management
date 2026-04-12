@@ -10,7 +10,7 @@ import Cart from "./pages/clientPage/Cart";
 import ProductDetails from "./pages/clientPage/ProductDetails";
 import Checkout from "./pages/clientPage/Checkout";
 import ClientLayout from "./layouts/ClientLayout";
-
+import ClientOrder from "./pages/clientPage/ClientOrder";
 import {
   createBrowserRouter,
   RouterProvider,
@@ -42,6 +42,10 @@ const router = createBrowserRouter([
       {
         path: "/product/:id",
         element: <ProductDetails />,
+      },
+      {
+        path: "/my-orders",
+        element: <ClientOrder />,
       },
     ],
   },
