@@ -1,7 +1,9 @@
 import { useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 import { addToCart } from "../../store/cartStore";
+
 export default function Home() {
+  const navigate = useNavigate();
 
   const [products] = useState([
     {
@@ -41,44 +43,33 @@ export default function Home() {
         🛍️ Our Products
       </h1>
 
-      {/* 🔥 Category Filter */}
+      {/* Category Filter */}
       <div className="flex justify-center gap-3 mb-6">
-        <button
-          onClick={() => setFilter("")}
-          className="bg-gray-300 px-4 py-1 rounded"
-        >
+        <button onClick={() => setFilter("")} className="bg-gray-300 px-4 py-1 rounded">
           All
         </button>
 
-        <button
-          onClick={() => setFilter("Clothing")}
-          className="bg-blue-500 text-white px-4 py-1 rounded"
-        >
+        <button onClick={() => setFilter("Clothing")} className="bg-blue-500 text-white px-4 py-1 rounded">
           Clothing
         </button>
 
-        <button
-          onClick={() => setFilter("Food")}
-          className="bg-green-500 text-white px-4 py-1 rounded"
-        >
+        <button onClick={() => setFilter("Food")} className="bg-green-500 text-white px-4 py-1 rounded">
           Food
         </button>
 
-        <button
-          onClick={() => setFilter("Electronics")}
-          className="bg-purple-500 text-white px-4 py-1 rounded"
-        >
+        <button onClick={() => setFilter("Electronics")} className="bg-purple-500 text-white px-4 py-1 rounded">
           Electronics
         </button>
       </div>
 
-      {/* 🔥 Product Grid */}
+      {/* Product Grid */}
       <div className="grid grid-cols-3 gap-6">
 
         {filteredProducts.map((p) => (
           <div
             key={p.id}
-            className="bg-white rounded-xl shadow hover:shadow-xl transition transform hover:-translate-y-1"
+            onClick={() => navigate(`/product/${p.id}`)}
+            className="bg-white rounded-xl shadow hover:shadow-xl transition transform hover:-translate-y-1 cursor-pointer"
           >
             <img
               src={p.image}
@@ -94,12 +85,17 @@ export default function Home() {
                   ${p.price}
                 </span>
 
-              <button
-  onClick={() => addToCart(p)}
-  className="bg-black text-white px-3 py-1 rounded hover:bg-gray-800"
->
-  Add to Cart
-</button>
+                {/* 🔥 IMPORTANT FIX */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation(); // ❗ prevent navigation
+                    addToCart(p);
+                  }}
+                  className="bg-black text-white px-3 py-1 rounded hover:bg-gray-800"
+                >
+                  Add to Cart
+                </button>
+
               </div>
             </div>
           </div>

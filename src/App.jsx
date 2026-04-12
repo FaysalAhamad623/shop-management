@@ -7,6 +7,7 @@ import Category from "./pages/Category";
 import Reports from "./pages/Reports";
 import Home from "./pages/clientPage/Home";
 import Cart from "./pages/clientPage/Cart";
+import ProductDetails from "./pages/clientPage/ProductDetails";
 import Checkout from "./pages/clientPage/Checkout";
 import ClientLayout from "./layouts/ClientLayout";
 
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
       {
         path: "/checkout",
         element: <Checkout />,
+      },
+      {
+        path: "/product/:id",
+        element: <ProductDetails />,
       },
     ],
   },
