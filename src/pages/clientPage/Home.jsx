@@ -1,13 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toggleWishlist, wishlist } from "../../store/wishlistStore";
 import { useCart } from "../../context/CartContext";
 import { useToast } from "../../context/ToastContext";
+
 export default function Home() {
   const navigate = useNavigate();
 
-  // 🔥 Context cart
   const { addToCart } = useCart();
+  const { showToast } = useToast();
+
+  const [loading, setLoading] = useState(true);
 
   const [products] = useState([
     {
@@ -35,50 +38,56 @@ export default function Home() {
 
   const [filter, setFilter] = useState("");
 
+  // 🔥 Loader effect
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 800);
+  }, []);
+
   const filteredProducts = products.filter(
     (p) => filter === "" || p.category === filter
   );
-  const { showToast } = useToast();
+
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
 
-      {/* 🔥 Title */}
+      {/* Title */}
       <h1 className="text-3xl font-bold mb-6 text-center">
         🛍️ Our Products
       </h1>
 
-      {/* 🔥 Category Filter */}
+      {/* Filter */}
       <div className="flex justify-center gap-3 mb-6">
-        <button
-          onClick={() => setFilter("")}
-          className="bg-gray-300 px-4 py-1 rounded"
-        >
+        <button onClick={() => setFilter("")} className="bg-gray-300 px-4 py-1 rounded">
           All
         </button>
-
-        <button
-          onClick={() => setFilter("Clothing")}
-          className="bg-blue-500 text-white px-4 py-1 rounded"
-        >
+        <button onClick={() => setFilter("Clothing")} className="bg-blue-500 text-white px-4 py-1 rounded">
           Clothing
         </button>
-
-        <button
-          onClick={() => setFilter("Food")}
-          className="bg-green-500 text-white px-4 py-1 rounded"
-        >
+        <button onClick={() => setFilter("Food")} className="bg-green-500 text-white px-4 py-1 rounded">
           Food
         </button>
-
-        <button
-          onClick={() => setFilter("Electronics")}
-          className="bg-purple-500 text-white px-4 py-1 rounded"
-        >
+        <button onClick={() => setFilter("Electronics")} className="bg-purple-500 text-white px-4 py-1 rounded">
           Electronics
         </button>
       </div>
 
-      {/* 🔥 Product Grid */}
+      {/* 🔥 LOADER */}
+      {loading ? (
+        <div className="grid grid-cols-3 gap-6">
+          {[1,2,3,4,5,6].map((_, i) => (
+            <div key={i} className="bg-white p-4 rounded-xl shadow animate-pulse">
+              <div className="h-40 bg-gray-300 rounded mb-3"></div>
+              <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+              <div className="h-3 bg-gray-200 rounded w-1/2 mb-3"></div>
+              <div className="h-6 bg-gray-300 rounded w-20"></div>
+            </div>
+          ))}
+        </div>
+      ) : (
+
+      /* 🔥 PRODUCT GRID */
       <div className="grid grid-cols-3 gap-6">
 
         {filteredProducts.map((p) => (
@@ -87,34 +96,40 @@ export default function Home() {
             onClick={() => navigate(`/product/${p.id}`)}
             className="bg-white rounded-xl shadow hover:shadow-xl transition transform hover:-translate-y-1 cursor-pointer"
           >
-            {/* Image */}
             <img
               src={p.image}
               className="w-full h-40 object-cover rounded-t-xl"
             />
 
-            {/* Info */}
             <div className="p-4">
               <h2 className="font-bold text-lg">{p.name}</h2>
               <p className="text-gray-500">{p.category}</p>
 
-              {/* 🔥 Price + Buttons */}
               <div className="flex justify-between items-center mt-3">
                 <span className="font-bold text-blue-500">
                   ${p.price}
                 </span>
 
-                <div className="flex items-center gap-3  text-white px-3 py-1 rounded-lg  hover:scale-105 transition">
+                <div className="flex gap-2 items-center">
 
                   {/* ❤️ Wishlist */}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       toggleWishlist(p);
+
+                      const exist = wishlist.find((x) => x.id === p.id);
+                      showToast(
+                        exist
+                          ? "Removed from wishlist ❌"
+                          : "Added to wishlist ❤️"
+                      );
                     }}
-                    className=" hover:bg-blue-900 px-2 py-1 rounded-lg transition"
+                    className="text-xl"
                   >
-                    {wishlist.find((x) => x.id === p.id) ? "❤️" : "🤍"}
+                    {wishlist.find((x) => x.id === p.id)
+                      ? "❤️"
+                      : "🤍"}
                   </button>
 
                   {/* 🛒 Cart */}
@@ -122,8 +137,9 @@ export default function Home() {
                     onClick={(e) => {
                       e.stopPropagation();
                       addToCart(p);
+                      showToast("Added to cart ✅");
                     }}
-                    className="flex items-center gap-1 bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-green-600 transition"
+                    className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-green-600 transition"
                   >
                     🛒 Add
                   </button>
@@ -136,6 +152,7 @@ export default function Home() {
         ))}
 
       </div>
+      )}
 
     </div>
   );
