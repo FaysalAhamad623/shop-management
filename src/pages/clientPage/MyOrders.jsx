@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { getOrders } from "../../store/orderStore";
+import { useNavigate } from "react-router-dom";
 
 export default function MyOrders() {
 
   const [orders, setOrders] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const data = getOrders();
-    console.log("ORDERS:", data); // 🔥 debug
+    console.log("ORDERS:", data);
     setOrders(data);
   }, []);
 
@@ -26,7 +28,8 @@ export default function MyOrders() {
           {orders.map((order) => (
             <div
               key={order.id}
-              className="bg-white p-5 rounded-xl shadow border-l-4 border-green-500"
+              onClick={() => navigate(`/order/${order.id}`)} // 🔥 ADD THIS
+              className="bg-white p-5 rounded-xl shadow border-l-4 border-green-500 cursor-pointer hover:bg-gray-50 transition"
             >
 
               <div className="flex justify-between">

@@ -1,44 +1,23 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { addToCart } from "../../store/cartStore";
+import { useCart } from "../../context/CartContext"; // 🔥 IMPORTANT
+import { getProducts } from "../../store/productStore";
 
 export default function ProductDetails() {
 
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // 🔥 Demo product list (same as Home)
-  const products = [
-    {
-      id: 1,
-      name: "T-Shirt",
-      price: 20,
-      category: "Clothing",
-      image: "https://via.placeholder.com/300",
-      desc: "Comfortable cotton t-shirt for everyday wear.",
-    },
-    {
-      id: 2,
-      name: "Burger",
-      price: 5,
-      category: "Food",
-      image: "https://via.placeholder.com/300",
-      desc: "Delicious fresh burger with cheese.",
-    },
-    {
-      id: 3,
-      name: "Headphone",
-      price: 60,
-      category: "Electronics",
-      image: "https://via.placeholder.com/300",
-      desc: "High quality sound with noise cancellation.",
-    },
-  ];
+  const { addToCart } = useCart(); // 🔥 FIX (store na, context use korte hobe)
 
-  // 🔥 Find product
-  const product = products.find((p) => p.id === Number(id));
+  const products = getProducts();
+
+  // 🔥 SAFE FIND
+  const product = products.find(
+    (p) => p.id.toString() === id
+  );
 
   if (!product) {
-    return <h2 className="p-6">Product not found</h2>;
+    return <h2 className="p-6">Product not found ❌</h2>;
   }
 
   return (
@@ -53,11 +32,13 @@ export default function ProductDetails() {
 
       <div className="grid md:grid-cols-2 gap-6 bg-white p-6 rounded-xl shadow">
 
-        {/* Image */}
-        <img
-          src={product.image}
-          className="w-full h-80 object-cover rounded"
-        />
+        {/* 🔥 Image with better fit */}
+        <div className="relative w-full h-80 bg-gray-100 rounded overflow-hidden">
+          <img
+            src={product.image}
+            className="w-full h-full object-contain"
+          />
+        </div>
 
         {/* Info */}
         <div>
@@ -73,13 +54,16 @@ export default function ProductDetails() {
             ${product.price}
           </p>
 
-          <p className="mb-4">
-            {product.desc}
+          <p className="mb-4 text-gray-600">
+            {product.desc || "No description available"}
           </p>
 
+          {/* 🔥 FIXED BUTTON */}
           <button
-            onClick={() => addToCart(product)}
-            className="bg-black text-white px-5 py-2 rounded hover:bg-gray-800"
+            onClick={() => {
+              addToCart(product);
+            }}
+            className="bg-black text-white px-5 py-2 rounded hover:bg-gray-800 transition"
           >
             Add to Cart
           </button>

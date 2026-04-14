@@ -16,6 +16,8 @@ import ProductDetails from "./pages/clientPage/ProductDetails";
 import Profile from "./pages/clientPage/Profile";
 import MyOrders from "./pages/clientPage/MyOrders";
 import Search from "./pages/clientPage/Search";
+import Wishlist from "./pages/clientPage/Wishlist";
+import OrderDetails from "./pages/OrderDetails"; // 🔥 IMPORTANT
 
 // 🔵 Admin Pages
 import Dashboard from "./pages/Dashboard";
@@ -24,15 +26,18 @@ import Orders from "./pages/Orders";
 import Customer from "./pages/Customer";
 import Category from "./pages/Category";
 import Reports from "./pages/Reports";
-import ProtectedRoute from "./routes/ProtectedRoute";
 import AdminLogin from "./pages/admin/AdminLogin";
+
+// 🔐 Routes
+import ProtectedRoute from "./routes/ProtectedRoute";
 import AdminRoute from "./routes/AdminRoute";
 
 // 🧱 Layouts
 import ClientLayout from "./layouts/ClientLayout";
 import AdminLayout from "./layouts/AdminLayout";
-import Wishlist from "./pages/clientPage/Wishlist";
+
 const router = createBrowserRouter([
+
   // 🔐 Auth (NO navbar)
   { path: "/", element: <Login /> },
   { path: "/register", element: <Register /> },
@@ -50,6 +55,9 @@ const router = createBrowserRouter([
       { path: "/search", element: <Search /> },
       { path: "/wishlist", element: <Wishlist /> },
       { path: "/my-orders", element: <MyOrders /> },
+
+      // 🔥 FIX (User + Admin both can access)
+      { path: "/order/:id", element: <OrderDetails /> },
     ],
   },
 
@@ -68,6 +76,10 @@ const router = createBrowserRouter([
       { path: "/categories", element: <Category /> },
       { path: "/reports", element: <Reports /> },
       { path: "/admin-login", element: <AdminLogin /> },
+
+      // 🔥 (optional duplicate remove korsi)
+      // { path: "/order/:id", element: <OrderDetails /> },
+
       {
         path: "/dashboard",
         element: (
