@@ -1,114 +1,151 @@
-import { useNavigate } from "react-router-dom";
-
+import { useEffect, useState } from "react";
+import { getOrders, updateOrderStatus, deleteOrder } from "../store/orderStore";
 export default function Dashboard() {
-  const navigate = useNavigate();
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/");
+  const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    setOrders(getOrders());
+  }, []);
+
+  const refresh = () => setOrders(getOrders());
+
+  const changeStatus = (id, status) => {
+    updateOrderStatus(id, status);
+    refresh();
   };
-
-  // Demo Data
-  const stats = {
-    totalSales: 5000,
-    todaySales: 300,
-    monthlySales: 1200,
-    totalProducts: 45,
-    totalOrders: 120,
-    pendingOrders: 10,
-    customers: 25,
+  const handleDelete = (id) => {
+    deleteOrder(id);
+    refresh();
   };
+  // 🔥 Analytics
+  const totalOrders = orders.length;
 
-  const products = [
-    { name: "T-Shirt", stock: 3 },
-    { name: "Jeans", stock: 10 },
-    { name: "Shirt", stock: 2 },
-  ];
+  const totalSales = orders.reduce(
+    (sum, o) => sum + Number(o.total || 0),
+    0
+  );
 
-  const lowStock = products.filter((p) => p.stock < 5);
+  const pending = orders.filter(o => o.status === "Pending").length;
+  const delivered = orders.filter(o => o.status === "Delivered").length;
+  const cancelled = orders.filter(o => o.status === "Cancelled").length;
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="p-6 bg-gray-100 min-h-screen">
 
-      {/* Sidebar */}
-      
+      <h1 className="text-3xl font-bold mb-6">
+        📊 Admin Dashboard
+      </h1>
 
-      {/* Main */}
-      <div className="flex-1 p-6">
+      {/* 🔥 Analytics Cards */}
+      <div className="grid grid-cols-5 gap-4 mb-6">
 
-        {/* Title */}
-        <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
-
-        {/* Stats */}
-        <div className="grid grid-cols-4 gap-4 mb-6">
-
-          <div className="bg-white p-4 rounded shadow">
-            <h3>Total Sales</h3>
-            <p className="text-xl font-bold text-blue-500">${stats.totalSales}</p>
-          </div>
-
-          <div className="bg-white p-4 rounded shadow">
-            <h3>Today Sales</h3>
-            <p className="text-xl font-bold text-green-500">${stats.todaySales}</p>
-          </div>
-
-          <div className="bg-white p-4 rounded shadow">
-            <h3>Monthly Sales</h3>
-            <p className="text-xl font-bold text-purple-500">${stats.monthlySales}</p>
-          </div>
-
-          <div className="bg-white p-4 rounded shadow">
-            <h3>Products</h3>
-            <p className="text-xl font-bold">{stats.totalProducts}</p>
-          </div>
-
-          <div className="bg-white p-4 rounded shadow">
-            <h3>Total Orders</h3>
-            <p className="text-xl font-bold">{stats.totalOrders}</p>
-          </div>
-
-          <div className="bg-white p-4 rounded shadow">
-            <h3>Pending Orders</h3>
-            <p className="text-xl font-bold text-yellow-500">{stats.pendingOrders}</p>
-          </div>
-
-          <div className="bg-white p-4 rounded shadow">
-            <h3>Customers</h3>
-            <p className="text-xl font-bold">{stats.customers}</p>
-          </div>
-
+        <div className="bg-white p-4 rounded-xl shadow">
+          <h2 className="text-gray-500">Orders</h2>
+          <p className="text-2xl font-bold">{totalOrders}</p>
         </div>
 
-        {/* Low Stock Alert */}
-        <div className="bg-white p-5 rounded shadow mb-6">
-          <h3 className="text-lg font-semibold mb-3 text-red-500">
-            ⚠️ Low Stock Products
-          </h3>
-
-          {lowStock.length === 0 ? (
-            <p>No low stock items</p>
-          ) : (
-            <ul>
-              {lowStock.map((p, i) => (
-                <li key={i} className="flex justify-between border-b py-1">
-                  <span>{p.name}</span>
-                  <span className="text-red-500">{p.stock} left</span>
-                </li>
-              ))}
-            </ul>
-          )}
+        <div className="bg-white p-4 rounded-xl shadow">
+          <h2 className="text-gray-500">Sales</h2>
+          <p className="text-2xl font-bold">${totalSales}</p>
         </div>
 
-        {/* Chart Placeholder */}
-        <div className="bg-white p-5 rounded shadow">
-          <h3 className="mb-3 font-semibold">Sales Chart</h3>
-
-          <div className="h-40 flex items-center justify-center text-gray-400">
-            Chart will be added (Chart.js)
-          </div>
+        <div className="bg-yellow-100 p-4 rounded-xl">
+          <h2>Pending</h2>
+          <p className="text-xl font-bold">{pending}</p>
         </div>
+
+        <div className="bg-green-100 p-4 rounded-xl">
+          <h2>Delivered</h2>
+          <p className="text-xl font-bold">{delivered}</p>
+        </div>
+
+        <div className="bg-red-100 p-4 rounded-xl">
+          <h2>Cancelled</h2>
+          <p className="text-xl font-bold">{cancelled}</p>
+        </div>
+       
 
       </div>
+
+      {/* 🔥 Orders List */}
+      {orders.length === 0 ? (
+        <p>No orders found 😢</p>
+      ) : (
+        <div className="space-y-4">
+
+          {orders.map((order) => (
+            <div
+              key={order.id}
+              className="bg-white p-5 rounded-xl shadow"
+            >
+
+              <div className="flex justify-between items-center mb-2">
+                <h2 className="font-bold">
+                  Order #{order.id}
+                </h2>
+
+                <span className={`px-3 py-1 rounded text-sm ${order.status === "Delivered"
+                    ? "bg-green-100 text-green-600"
+                    : order.status === "Cancelled"
+                      ? "bg-red-100 text-red-600"
+                      : "bg-yellow-100 text-yellow-600"
+                  }`}>
+                  {order.status}
+                </span>
+              </div>
+
+              <p className="text-gray-500 text-sm mb-2">
+                {order.date}
+              </p>
+
+              <p className="mb-2 font-semibold">
+                Payment: {order.payment}
+              </p>
+
+              <p className="mb-3 font-bold">
+                Total: ${order.total}
+              </p>
+
+              {/* Items */}
+              <div className="mb-3">
+                {order.items.map((item) => (
+                  <p key={item.id} className="text-sm">
+                    {item.name} x{item.quantity}
+                  </p>
+                ))}
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-2">
+
+                <button
+                  onClick={() => changeStatus(order.id, "Delivered")}
+                  className="bg-green-500 text-white px-3 py-1 rounded"
+                >
+                  Delivered
+                </button>
+
+                <button
+                  onClick={() => changeStatus(order.id, "Cancelled")}
+                  className="bg-red-500 text-white px-3 py-1 rounded"
+                >
+                  Cancel
+                </button>
+                 <button
+          onClick={() => handleDelete(order.id)}
+          className="bg-black text-white px-3 py-1 rounded"
+        >
+          Delete
+        </button>
+              </div>
+
+            </div>
+          ))}
+
+        </div>
+      )}
+
     </div>
   );
 }

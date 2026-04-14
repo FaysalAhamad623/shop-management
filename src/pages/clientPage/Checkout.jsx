@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useCart } from "../../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../../context/ToastContext";
+import { saveOrder } from "../../store/orderStore";
 
 export default function Checkout() {
 
@@ -9,7 +10,6 @@ export default function Checkout() {
   const navigate = useNavigate();
   const { showToast } = useToast();
 
-  // 🔥 Modal state
   const [showModal, setShowModal] = useState(false);
 
   const [form, setForm] = useState({
@@ -24,10 +24,8 @@ export default function Checkout() {
     0
   );
 
-  // 🔥 Place order click
+  // 🔥 Place Order
   const handleOrder = () => {
-    console.log("CLICKED");
-
     if (!form.name || !form.phone || !form.address) {
       showToast("Please fill all fields ❌", "error");
       return;
@@ -38,20 +36,29 @@ export default function Checkout() {
       return;
     }
 
-    // 🔥 show modal
     setShowModal(true);
   };
 
-  // 🔥 Confirm order
+  // 🔥 Confirm Order
   const confirmOrder = () => {
+
+    const newOrder = {
+      id: Date.now(),
+      items: cart,
+      total: total,
+      status: "Pending",
+      payment: form.payment,
+      date: new Date().toLocaleString(),
+    };
+
+    saveOrder(newOrder);
+
     clearCart();
     setShowModal(false);
 
-    showToast("Order placed successfully 🎉");
+    showToast(`Payment via ${form.payment.toUpperCase()} successful 🎉`);
 
-    setTimeout(() => {
-      navigate("/home");
-    }, 700);
+    navigate("/my-orders");
   };
 
   return (
@@ -101,17 +108,14 @@ export default function Checkout() {
               }
             />
 
-            {/* 💳 Payment */}
+            {/* 💳 Payment Method */}
             <div>
               <p className="mb-2 font-semibold">Payment Method</p>
 
-              <div className="flex gap-4">
+              <div className="flex gap-3">
 
                 <button
-                  type="button"
-                  onClick={() =>
-                    setForm({ ...form, payment: "cash" })
-                  }
+                  onClick={() => setForm({ ...form, payment: "cash" })}
                   className={`px-4 py-2 rounded ${
                     form.payment === "cash"
                       ? "bg-green-500 text-white"
@@ -122,10 +126,18 @@ export default function Checkout() {
                 </button>
 
                 <button
-                  type="button"
-                  onClick={() =>
-                    setForm({ ...form, payment: "card" })
-                  }
+                  onClick={() => setForm({ ...form, payment: "bkash" })}
+                  className={`px-4 py-2 rounded ${
+                    form.payment === "bkash"
+                      ? "bg-pink-500 text-white"
+                      : "bg-gray-200"
+                  }`}
+                >
+                  bKash
+                </button>
+
+                <button
+                  onClick={() => setForm({ ...form, payment: "card" })}
                   className={`px-4 py-2 rounded ${
                     form.payment === "card"
                       ? "bg-blue-500 text-white"
@@ -137,6 +149,43 @@ export default function Checkout() {
 
               </div>
             </div>
+
+            {/* 🔥 bKash */}
+            {form.payment === "bkash" && (
+              <div className="mt-3">
+                <input
+                  type="text"
+                  placeholder="bKash Number"
+                  className="w-full border p-2 rounded mb-2"
+                />
+                <input
+                  type="text"
+                  placeholder="Transaction ID"
+                  className="w-full border p-2 rounded"
+                />
+              </div>
+            )}
+
+            {/* 🔥 Card */}
+            {form.payment === "card" && (
+              <div className="mt-3 space-y-2">
+                <input
+                  type="text"
+                  placeholder="Card Number"
+                  className="w-full border p-2 rounded"
+                />
+                <input
+                  type="text"
+                  placeholder="MM/YY"
+                  className="w-full border p-2 rounded"
+                />
+                <input
+                  type="text"
+                  placeholder="CVV"
+                  className="w-full border p-2 rounded"
+                />
+              </div>
+            )}
 
           </div>
 
@@ -163,9 +212,8 @@ export default function Checkout() {
           </h3>
 
           <button
-            type="button"
             onClick={handleOrder}
-            className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 active:scale-95 transition"
+            className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
           >
             Place Order
           </button>
@@ -185,7 +233,7 @@ export default function Checkout() {
             </h2>
 
             <p className="text-gray-600 mb-4">
-              Cash on Delivery?
+              Confirm payment via {form.payment.toUpperCase()}?
             </p>
 
             <div className="flex justify-center gap-4">

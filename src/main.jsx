@@ -6,8 +6,8 @@ import { ToastProvider } from "./context/ToastContext";
 
 createRoot(document.getElementById('root')).render(
   <ToastProvider>
-  <CartProvider>
-    <App />
-  </CartProvider>
-</ToastProvider>
+    <CartProvider>
+      <App />
+    </CartProvider>
+  </ToastProvider>
 )

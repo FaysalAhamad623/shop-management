@@ -14,7 +14,7 @@ import Cart from "./pages/clientPage/Cart";
 import Checkout from "./pages/clientPage/Checkout";
 import ProductDetails from "./pages/clientPage/ProductDetails";
 import Profile from "./pages/clientPage/Profile";
-import ClientOrders from "./pages/clientPage/ClientOrder";
+import MyOrders from "./pages/clientPage/MyOrders";
 import Search from "./pages/clientPage/Search";
 
 // 🔵 Admin Pages
@@ -44,29 +44,29 @@ const router = createBrowserRouter([
       { path: "/cart", element: <Cart /> },
       { path: "/checkout", element: <Checkout /> },
       { path: "/product/:id", element: <ProductDetails /> },
-      { path: "/my-orders", element: <ClientOrders /> },
       { path: "/profile", element: <Profile /> },
       { path: "/search", element: <Search /> },
       { path: "/wishlist", element: <Wishlist /> },
+      { path: "/my-orders", element: <MyOrders /> },
     ],
   },
 
   // 🔵 Admin Routes (Sidebar shoho)
- {
-  element: (
-    <ProtectedRoute role="admin">
-      <AdminLayout />
-    </ProtectedRoute>
-  ),
-  children: [
-    { path: "/dashboard", element: <Dashboard /> },
-    { path: "/products", element: <Products /> },
-    { path: "/orders", element: <Orders /> },
-    { path: "/customer", element: <Customer /> },
-    { path: "/categories", element: <Category /> },
-    { path: "/reports", element: <Reports /> },
-  ],
-},
+  {
+    element: (
+      <ProtectedRoute role="admin">
+        <AdminLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      { path: "/dashboard", element: <Dashboard /> },
+      { path: "/products", element: <Products /> },
+      { path: "/orders", element: <Orders /> },
+      { path: "/customer", element: <Customer /> },
+      { path: "/categories", element: <Category /> },
+      { path: "/reports", element: <Reports /> },
+    ],
+  },
 ]);
 
 function App() {
