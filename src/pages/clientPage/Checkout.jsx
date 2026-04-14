@@ -47,9 +47,14 @@ export default function Checkout() {
       items: cart,
       total: total,
       status: "Pending",
-      payment: form.payment,
       date: new Date().toLocaleString(),
+
+      // 🔥 ADD THESE
+      name: form.name,
+      phone: form.phone,
+      email: form.email || "N/A",
     };
+
 
     saveOrder(newOrder);
 
@@ -116,33 +121,30 @@ export default function Checkout() {
 
                 <button
                   onClick={() => setForm({ ...form, payment: "cash" })}
-                  className={`px-4 py-2 rounded ${
-                    form.payment === "cash"
+                  className={`px-4 py-2 rounded ${form.payment === "cash"
                       ? "bg-green-500 text-white"
                       : "bg-gray-200"
-                  }`}
+                    }`}
                 >
                   Cash
                 </button>
 
                 <button
                   onClick={() => setForm({ ...form, payment: "bkash" })}
-                  className={`px-4 py-2 rounded ${
-                    form.payment === "bkash"
+                  className={`px-4 py-2 rounded ${form.payment === "bkash"
                       ? "bg-pink-500 text-white"
                       : "bg-gray-200"
-                  }`}
+                    }`}
                 >
                   bKash
                 </button>
 
                 <button
                   onClick={() => setForm({ ...form, payment: "card" })}
-                  className={`px-4 py-2 rounded ${
-                    form.payment === "card"
+                  className={`px-4 py-2 rounded ${form.payment === "card"
                       ? "bg-blue-500 text-white"
                       : "bg-gray-200"
-                  }`}
+                    }`}
                 >
                   Card
                 </button>

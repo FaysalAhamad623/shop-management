@@ -1,45 +1,29 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getOrders, updateOrderStatus } from "../store/orderStore";
 
 export default function Orders() {
-  const [orders, setOrders] = useState([
-    {
-      id: 1,
-      customer: "Faysal",
-      total: 120,
-      status: "Pending",
-    },
-    {
-      id: 2,
-      customer: "Rahim",
-      total: 250,
-      status: "Delivered",
-    },
-    {
-      id: 3,
-      customer: "Karim",
-      total: 80,
-      status: "Processing",
-    },
-  ]);
 
-  // 🔥 Status change
-  const handleStatusChange = (id, newStatus) => {
-    setOrders(
-      orders.map((order) =>
-        order.id === id ? { ...order, status: newStatus } : order
-      )
-    );
+  const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    setOrders(getOrders());
+  }, []);
+
+  const handleStatusChange = (id, status) => {
+    updateOrderStatus(id, status);
+    setOrders(getOrders()); // 🔥 refresh
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6 bg-gray-100 min-h-screen">
 
-      <h1 className="text-2xl font-bold mb-4">Orders</h1>
+      <h1 className="text-2xl font-bold mb-4">
+        📦 Orders
+      </h1>
 
-      {/* Table */}
-      <table className="w-full bg-white rounded shadow">
-        <thead className="bg-gray-200">
-          <tr>
+      <table className="w-full bg-white rounded-xl shadow">
+        <thead>
+          <tr className="bg-gray-200">
             <th className="p-2">Order ID</th>
             <th>Customer</th>
             <th>Total</th>
@@ -49,38 +33,36 @@ export default function Orders() {
         </thead>
 
         <tbody>
-          {orders.map((order) => (
-            <tr key={order.id} className="text-center border-t">
+          {orders.map((o) => (
+            <tr key={o.id} className="text-center border-t">
 
-              <td className="p-2">#{order.id}</td>
-              <td>{order.customer}</td>
-              <td>${order.total}</td>
+              <td className="p-2">#{o.id}</td>
+              <td>{o.name}</td>
+              <td>${o.total}</td>
 
               {/* Status */}
               <td>
-                <span
-                  className={`px-2 py-1 rounded text-white ${
-                    order.status === "Pending"
-                      ? "bg-yellow-500"
-                      : order.status === "Processing"
-                      ? "bg-blue-500"
-                      : order.status === "Delivered"
-                      ? "bg-green-500"
-                      : "bg-red-500"
-                  }`}
-                >
-                  {order.status}
+                <span className={`px-2 py-1 rounded text-white ${
+                  o.status === "Delivered"
+                    ? "bg-green-500"
+                    : o.status === "Cancelled"
+                    ? "bg-red-500"
+                    : o.status === "Processing"
+                    ? "bg-blue-500"
+                    : "bg-yellow-500"
+                }`}>
+                  {o.status}
                 </span>
               </td>
 
-              {/* Change status */}
+              {/* Update */}
               <td>
                 <select
-                  className="border p-1"
-                  value={order.status}
+                  value={o.status}
                   onChange={(e) =>
-                    handleStatusChange(order.id, e.target.value)
+                    handleStatusChange(o.id, e.target.value)
                   }
+                  className="border px-2 py-1 rounded"
                 >
                   <option>Pending</option>
                   <option>Processing</option>
@@ -93,6 +75,7 @@ export default function Orders() {
           ))}
         </tbody>
       </table>
+
     </div>
   );
 }

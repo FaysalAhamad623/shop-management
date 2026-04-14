@@ -45,16 +45,23 @@ export default function Navbar() {
           />
 
           {/* 🛒 Cart */}
-          <div className="relative cursor-pointer">
-  <ShoppingCart size={22} />
+          <div
+            onClick={() => navigate("/cart")}
+            className="relative cursor-pointer"
+          >
+            <ShoppingCart size={22} />
 
-  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1 rounded-full">
-    {cart.length}
-  </span>
-</div>
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1 rounded-full">
+              {cart.length}
+            </span>
+          </div>
 
           {/* 👤 User */}
-          <User size={22} className="cursor-pointer" />
+          <User
+            size={22}
+            className="cursor-pointer"
+            onClick={() => navigate("/profile")}
+          />
 
         </div>
 

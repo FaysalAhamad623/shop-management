@@ -1,77 +1,67 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getOrders } from "../store/orderStore";
 
-export default function Customer() {
-  const [customers] = useState([
-    {
-      id: 1,
-      name: "Faysal",
-      phone: "01700000000",
-      email: "faysal@gmail.com",
-      orders: 5,
-      spent: 500,
-    },
-    {
-      id: 2,
-      name: "Rahim",
-      phone: "01800000000",
-      email: "rahim@gmail.com",
-      orders: 3,
-      spent: 300,
-    },
-    {
-      id: 3,
-      name: "Karim",
-      phone: "01900000000",
-      email: "karim@gmail.com",
-      orders: 2,
-      spent: 150,
-    },
-  ]);
+export default function Customers() {
 
-  const [search, setSearch] = useState("");
+  const [customers, setCustomers] = useState([]);
 
-  // 🔥 Search
-  const filteredCustomers = customers.filter((c) =>
-    c.name.toLowerCase().includes(search.toLowerCase())
-  );
+  useEffect(() => {
+    const orders = getOrders();
+
+    // 🔥 group by customer (phone as unique)
+    const map = {};
+
+    orders.forEach((order) => {
+      const key = order.phone;
+
+      if (!map[key]) {
+        map[key] = {
+          name: order.name,
+          phone: order.phone,
+          email: order.email || "N/A",
+          orders: 1,
+          total: Number(order.total),
+        };
+      } else {
+        map[key].orders += 1;
+        map[key].total += Number(order.total);
+      }
+    });
+
+    setCustomers(Object.values(map));
+  }, []);
 
   return (
-    <div className="p-6">
+    <div className="p-6 bg-gray-100 min-h-screen">
 
-      <h1 className="text-2xl font-bold mb-4">Customers</h1>
+      <h1 className="text-2xl font-bold mb-4">
+        👥 Customers
+      </h1>
 
-      {/* Search */}
-      <input
-        type="text"
-        placeholder="Search customer..."
-        className="border p-2 mb-4 w-full rounded"
-        onChange={(e) => setSearch(e.target.value)}
-      />
-
-      {/* Table */}
-      <table className="w-full bg-white rounded shadow">
-        <thead className="bg-gray-200">
-          <tr>
+      <table className="w-full bg-white rounded-xl shadow">
+        <thead>
+          <tr className="bg-gray-200">
             <th className="p-2">Name</th>
-            <th>Phone</th>
-            <th>Email</th>
-            <th>Orders</th>
-            <th>Total Spent</th>
+            <th className="p-2">Phone</th>
+            <th className="p-2">Email</th>
+            <th className="p-2">Orders</th>
+            <th className="p-2">Total Spent</th>
           </tr>
         </thead>
 
         <tbody>
-          {filteredCustomers.map((c) => (
-            <tr key={c.id} className="text-center border-t">
+          {customers.map((c, i) => (
+            <tr key={i} className="text-center border-t">
               <td className="p-2">{c.name}</td>
               <td>{c.phone}</td>
               <td>{c.email}</td>
               <td>{c.orders}</td>
-              <td>${c.spent}</td>
+              <td>${c.total}</td>
             </tr>
           ))}
         </tbody>
       </table>
+
     </div>
   );
 }

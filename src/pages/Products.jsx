@@ -15,6 +15,7 @@ export default function Products() {
     name: "",
     price: "",
     category: "",
+    image: "",
   });
 
   useEffect(() => {
@@ -39,7 +40,14 @@ export default function Products() {
     setForm({ name: "", price: "", category: "" });
     refresh();
   };
-
+ {form.image && (
+  <div className="mt-3">
+    <img
+      src={form.image}
+      className="w-32 h-32 object-cover rounded shadow"
+    />
+  </div>
+)};
   const handleEdit = (p) => {
     setForm(p);
     setEditing(p.id);
@@ -81,7 +89,52 @@ export default function Products() {
           }
           className="border p-2 w-full rounded"
         />
+       <div
+  onDragOver={(e) => e.preventDefault()}
+  onDrop={(e) => {
+    e.preventDefault();
 
+    const file = e.dataTransfer.files[0];
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      setForm({ ...form, image: reader.result });
+    };
+
+    if (file) reader.readAsDataURL(file);
+  }}
+  className="border-2 border-dashed p-6 text-center rounded-lg cursor-pointer hover:bg-gray-50 transition"
+>
+  <p className="text-gray-500">
+    Drag & Drop Image Here 📦  
+    <br /> or Click to Upload
+  </p>
+
+  {/* Hidden input */}
+  <input
+    type="file"
+    accept="image/*"
+    onChange={(e) => {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        setForm({ ...form, image: reader.result });
+      };
+
+      if (file) reader.readAsDataURL(file);
+    }}
+    className="hidden"
+    id="fileUpload"
+  />
+
+  <label
+    htmlFor="fileUpload"
+    className="text-blue-500 underline cursor-pointer"
+  >
+    Browse
+  </label>
+</div>
         <button
           onClick={handleSubmit}
           className="bg-blue-500 text-white px-4 py-2 rounded"

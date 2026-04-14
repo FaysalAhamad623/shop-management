@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toggleWishlist, wishlist } from "../../store/wishlistStore";
 import { useCart } from "../../context/CartContext";
 import { useToast } from "../../context/ToastContext";
+import { getProducts } from "../../store/productStore";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -12,29 +13,11 @@ export default function Home() {
 
   const [loading, setLoading] = useState(true);
 
-  const [products] = useState([
-    {
-      id: 1,
-      name: "T-Shirt",
-      price: 20,
-      category: "Clothing",
-      image: "https://via.placeholder.com/200",
-    },
-    {
-      id: 2,
-      name: "Burger",
-      price: 5,
-      category: "Food",
-      image: "https://via.placeholder.com/200",
-    },
-    {
-      id: 3,
-      name: "Headphone",
-      price: 60,
-      category: "Electronics",
-      image: "https://via.placeholder.com/200",
-    },
-  ]);
+ const [products, setProducts] = useState([]);
+
+useEffect(() => {
+  setProducts(getProducts());
+}, []);
 
   const [filter, setFilter] = useState("");
 
@@ -96,10 +79,21 @@ export default function Home() {
             onClick={() => navigate(`/product/${p.id}`)}
             className="bg-white rounded-xl shadow hover:shadow-xl transition transform hover:-translate-y-1 cursor-pointer"
           >
-            <img
-              src={p.image}
-              className="w-full h-40 object-cover rounded-t-xl"
-            />
+   <div className="relative w-full h-40 overflow-hidden rounded-t-xl">
+
+  {/* 🔥 Blur Background */}
+  <img
+    src={p.image}
+    className="absolute w-full h-full object-cover blur-md scale-110"
+  />
+
+  {/* 🔥 Main Image */}
+  <img
+    src={p.image}
+    className="relative w-full h-full object-contain"
+  />
+
+</div>
 
             <div className="p-4">
               <h2 className="font-bold text-lg">{p.name}</h2>

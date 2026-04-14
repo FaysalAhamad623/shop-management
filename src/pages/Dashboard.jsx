@@ -1,5 +1,15 @@
 import { useEffect, useState } from "react";
+
+import { useNavigate } from "react-router-dom";
 import { getOrders, updateOrderStatus, deleteOrder } from "../store/orderStore";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+} from "recharts";
 export default function Dashboard() {
 
   const [orders, setOrders] = useState([]);
@@ -14,6 +24,11 @@ export default function Dashboard() {
     updateOrderStatus(id, status);
     refresh();
   };
+  const navigate = useNavigate();
+  const chartData = orders.map((o) => ({
+    date: new Date(o.date).toLocaleDateString(),
+    total: o.total,
+  }));
   const handleDelete = (id) => {
     deleteOrder(id);
     refresh();
@@ -36,6 +51,7 @@ export default function Dashboard() {
       <h1 className="text-3xl font-bold mb-6">
         📊 Admin Dashboard
       </h1>
+      
 
       {/* 🔥 Analytics Cards */}
       <div className="grid grid-cols-5 gap-4 mb-6">
@@ -64,7 +80,22 @@ export default function Dashboard() {
           <h2>Cancelled</h2>
           <p className="text-xl font-bold">{cancelled}</p>
         </div>
-       
+
+
+      </div>
+      <div className="bg-white p-5 rounded-xl shadow mb-6">
+
+        <h2 className="text-xl font-bold mb-4">
+          📈 Sales Overview
+        </h2>
+
+        <LineChart width={600} height={300} data={chartData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="date" />
+          <YAxis />
+          <Tooltip />
+          <Line type="monotone" dataKey="total" stroke="#3b82f6" />
+        </LineChart>
 
       </div>
 
@@ -86,10 +117,10 @@ export default function Dashboard() {
                 </h2>
 
                 <span className={`px-3 py-1 rounded text-sm ${order.status === "Delivered"
-                    ? "bg-green-100 text-green-600"
-                    : order.status === "Cancelled"
-                      ? "bg-red-100 text-red-600"
-                      : "bg-yellow-100 text-yellow-600"
+                  ? "bg-green-100 text-green-600"
+                  : order.status === "Cancelled"
+                    ? "bg-red-100 text-red-600"
+                    : "bg-yellow-100 text-yellow-600"
                   }`}>
                   {order.status}
                 </span>
@@ -132,12 +163,12 @@ export default function Dashboard() {
                 >
                   Cancel
                 </button>
-                 <button
-          onClick={() => handleDelete(order.id)}
-          className="bg-black text-white px-3 py-1 rounded"
-        >
-          Delete
-        </button>
+                <button
+                  onClick={() => handleDelete(order.id)}
+                  className="bg-black text-white px-3 py-1 rounded"
+                >
+                  Delete
+                </button>
               </div>
 
             </div>
