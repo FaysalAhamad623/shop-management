@@ -11,7 +11,7 @@ export const deleteOrder = (id) => {
   localStorage.setItem("orders", JSON.stringify(orders));
 };
 export const updateOrderStatus = (id, status) => {
-  const orders = getOrders();
+  const orders = JSON.parse(localStorage.getItem("orders")) || [];
 
   const updated = orders.map((o) =>
     o.id === id ? { ...o, status } : o

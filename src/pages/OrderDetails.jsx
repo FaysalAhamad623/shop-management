@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { getOrders } from "../store/orderStore";
-
+import OrderTimeline from "../components/OrderTimeline";
 export default function OrderDetails() {
 
   const { id } = useParams();
@@ -41,8 +41,18 @@ export default function OrderDetails() {
           >
             <span>{item.name} x{item.quantity}</span>
             <span>${item.price * item.quantity}</span>
+            <span className={`px-3 py-1 rounded ${
+  order.status === "Delivered"
+    ? "bg-green-200 text-green-700"
+    : order.status === "Processing"
+    ? "bg-blue-200 text-blue-700"
+    : "bg-yellow-200 text-yellow-700"
+}`}>
+  {order.status}
+</span>
           </div>
         ))}
+        <OrderTimeline status={order.status} />
 
         <h3 className="mt-4 font-bold text-lg">
           Total: ${order.total}
