@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { getOrders, updateOrderStatus } from "../store/orderStore";
 import { useNavigate } from "react-router-dom";
+
 export default function Orders() {
 
   const [orders, setOrders] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setOrders(getOrders());
   }, []);
-
-  const navigate = useNavigate();
 
   const handleStatusChange = (id, status) => {
     updateOrderStatus(id, status);
@@ -36,37 +36,44 @@ export default function Orders() {
 
         <tbody>
           {orders.map((o) => (
-<tr
-  key={o.id}
-  onClick={() => navigate(`/order/${o.id}`)}
-  className="text-center border-t cursor-pointer hover:bg-gray-100"
->
+            <tr
+              key={o.id}
+              onClick={() => navigate(`/order/${o.id}`)}
+              className="text-center border-t cursor-pointer hover:bg-gray-100"
+            >
               <td className="p-2">#{o.id}</td>
               <td>{o.name}</td>
               <td>${o.total}</td>
 
               {/* Status */}
               <td>
-                <span className={`px-2 py-1 rounded text-white ${
-                  o.status === "Delivered"
-                    ? "bg-green-500"
-                    : o.status === "Cancelled"
-                    ? "bg-red-500"
-                    : o.status === "Processing"
-                    ? "bg-blue-500"
-                    : "bg-yellow-500"
-                }`}>
+                <span
+                  className={`px-2 py-1 rounded text-white ${
+                    o.status === "Delivered"
+                      ? "bg-green-500"
+                      : o.status === "Cancelled"
+                      ? "bg-red-500"
+                      : o.status === "Processing"
+                      ? "bg-blue-500"
+                      : "bg-yellow-500"
+                  }`}
+                >
                   {o.status}
                 </span>
               </td>
 
-              {/* Update */}
+              {/* 🔥 UPDATE (FIXED) */}
               <td>
                 <select
                   value={o.status}
-                  onChange={(e) =>
-                    handleStatusChange(o.id, e.target.value)
-                  }
+
+                  // 🔥 VERY IMPORTANT (prevent redirect)
+                  onClick={(e) => e.stopPropagation()}
+                  onChange={(e) => {
+                    e.stopPropagation(); // 🔥 MUST
+                    handleStatusChange(o.id, e.target.value);
+                  }}
+
                   className="border px-2 py-1 rounded"
                 >
                   <option>Pending</option>
