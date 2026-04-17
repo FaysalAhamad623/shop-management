@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getOrders, updateOrderStatus } from "../store/orderStore";
 import { useNavigate } from "react-router-dom";
-
+import { addNotification } from "../store/notificationStore";
 export default function Orders() {
 
   const [orders, setOrders] = useState([]);
@@ -12,9 +12,11 @@ export default function Orders() {
   }, []);
 
   const handleStatusChange = (id, status) => {
-    updateOrderStatus(id, status);
-    setOrders(getOrders()); // 🔥 refresh
-  };
+  updateOrderStatus(id, status);
+  setOrders(getOrders());
+
+  addNotification(`Order #${id} is now ${status}`);
+};
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
