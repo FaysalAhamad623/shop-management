@@ -19,3 +19,14 @@ export const updateOrderStatus = (id, status) => {
 
   localStorage.setItem("orders", JSON.stringify(updated));
 };
+export const cancelOrder = (id) => {
+  const orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+  const updated = orders.map((o) =>
+    o.id === id && o.status === "Pending"
+      ? { ...o, status: "Cancelled" }
+      : o
+  );
+
+  localStorage.setItem("orders", JSON.stringify(updated));
+};

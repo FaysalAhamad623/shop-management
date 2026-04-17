@@ -1,6 +1,8 @@
 import { useParams } from "react-router-dom";
 import { getOrders } from "../store/orderStore";
 import OrderTimeline from "../components/OrderTimeline";
+import { cancelOrder } from "../store/orderStore";
+import { useNavigate } from "react-router-dom";
 export default function OrderDetails() {
 
   const { id } = useParams();
@@ -57,6 +59,19 @@ export default function OrderDetails() {
         <h3 className="mt-4 font-bold text-lg">
           Total: ${order.total}
         </h3>
+        {order.status === "Pending" && (
+  <button
+    onClick={() => {
+      cancelOrder(order.id);
+      alert("Order Cancelled ❌");
+      navigate("/my-orders");
+    }}
+    className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+  >
+    Cancel Order
+  </button>
+)}
+        
 
       </div>
 
