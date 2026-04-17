@@ -1,7 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { getProducts } from "../../store/productStore";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { flyToCart } from "../../utils/flyToCart";
 import {
   getReviews,
   addReview,
@@ -86,6 +87,7 @@ export default function ProductDetails() {
   const related = products.filter(
     (p) => p.category === product.category && p.id !== product.id
   );
+  const imgRef = useRef(null);
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -97,9 +99,11 @@ export default function ProductDetails() {
       <div className="grid md:grid-cols-2 gap-6 bg-white p-6 rounded-xl shadow">
 
         {/* IMAGE */}
-        <div className="w-full h-80 bg-gray-100 rounded overflow-hidden">
-          <img src={product.image} className="w-full h-full object-contain" />
-        </div>
+       <img
+  ref={imgRef}
+  src={product.image}
+  className="w-full h-full object-contain"
+/>
 
         {/* INFO */}
         <div>
@@ -114,13 +118,15 @@ export default function ProductDetails() {
             {product.desc || "No description available"}
           </p>
 
-          <button
-            onClick={() => addToCart(product)}
-            className="bg-black text-white px-5 py-2 rounded"
-          >
-            Add to Cart
-          </button>
-
+        <button
+  onClick={() => {
+    flyToCart(imgRef.current); // 🔥 animation
+    addToCart(product);        // 🔥 cart add
+  }}
+  className="bg-black text-white px-5 py-2 rounded hover:bg-gray-800"
+>
+  Add to Cart
+</button>
           {/* ⭐ REVIEW */}
           <div className="mt-8">
 

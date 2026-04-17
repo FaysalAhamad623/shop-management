@@ -47,17 +47,17 @@ export default function Navbar() {
             className="border px-3 py-1 rounded-lg"
           />
 
-          {/* 🛒 Cart */}
-          <div
-            onClick={() => navigate("/cart")}
-            className="relative cursor-pointer"
-          >
-            <ShoppingCart size={22} />
+        <div
+  id="cart-icon"   // 🔥 THIS LINE ADD
+  onClick={() => navigate("/cart")}
+  className="relative cursor-pointer"
+>
+  <ShoppingCart size={22} />
 
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1 rounded-full">
-              {cart.length}
-            </span>
-          </div>
+  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1 rounded-full">
+    {cart.length}
+  </span>
+</div>
           <div className="relative">
 
             <button onClick={() => setShow(!show)}>
