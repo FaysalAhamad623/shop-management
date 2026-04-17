@@ -1,17 +1,22 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useCart } from "../../context/CartContext"; // 🔥 IMPORTANT
+import { useCart } from "../../context/CartContext";
 import { getProducts } from "../../store/productStore";
+import { useState } from "react";
+import {
+  getReviews,
+  addReview,
+  deleteReview,
+} from "../../store/reviewStore";
 
 export default function ProductDetails() {
 
   const { id } = useParams();
   const navigate = useNavigate();
-
-  const { addToCart } = useCart(); // 🔥 FIX (store na, context use korte hobe)
+  const { addToCart } = useCart();
 
   const products = getProducts();
 
-  // 🔥 SAFE FIND
+  // 🔥 FIND PRODUCT FIRST
   const product = products.find(
     (p) => p.id.toString() === id
   );
@@ -19,6 +24,45 @@ export default function ProductDetails() {
   if (!product) {
     return <h2 className="p-6">Product not found ❌</h2>;
   }
+
+  // 🔥 STATE AFTER PRODUCT
+  const [reviews, setReviews] = useState(getReviews());
+
+  const [form, setForm] = useState({
+    rating: 5,
+    comment: "",
+  });
+
+  // 🔥 FILTER REVIEWS
+  const productReviews = reviews.filter(
+    (r) => r.productId === product.id
+  );
+
+  // 🔥 AVG RATING
+  const avgRating =
+    productReviews.length > 0
+      ? (
+          productReviews.reduce((a, b) => a + b.rating, 0) /
+          productReviews.length
+        ).toFixed(1)
+      : 0;
+
+  // 🔥 ADD REVIEW
+  const handleReview = () => {
+    if (!form.comment) return;
+
+    const newReview = {
+      id: Date.now(),
+      productId: product.id,
+      rating: Number(form.rating),
+      comment: form.comment,
+    };
+
+    addReview(newReview);
+    setReviews(getReviews());
+
+    setForm({ rating: 5, comment: "" });
+  };
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -32,7 +76,7 @@ export default function ProductDetails() {
 
       <div className="grid md:grid-cols-2 gap-6 bg-white p-6 rounded-xl shadow">
 
-        {/* 🔥 Image with better fit */}
+        {/* Image */}
         <div className="relative w-full h-80 bg-gray-100 rounded overflow-hidden">
           <img
             src={product.image}
@@ -58,15 +102,82 @@ export default function ProductDetails() {
             {product.desc || "No description available"}
           </p>
 
-          {/* 🔥 FIXED BUTTON */}
           <button
-            onClick={() => {
-              addToCart(product);
-            }}
-            className="bg-black text-white px-5 py-2 rounded hover:bg-gray-800 transition"
+            onClick={() => addToCart(product)}
+            className="bg-black text-white px-5 py-2 rounded hover:bg-gray-800"
           >
             Add to Cart
           </button>
+
+          {/* ⭐ REVIEW SECTION */}
+          <div className="mt-8">
+
+            <h2 className="text-xl font-bold mb-2">
+              ⭐ Reviews ({productReviews.length})
+            </h2>
+
+            <p className="mb-3 text-yellow-500">
+              Average: {avgRating} ⭐
+            </p>
+
+            {/* Add Review */}
+            <div className="mb-4 space-y-2">
+
+              <select
+                value={form.rating}
+                onChange={(e) =>
+                  setForm({ ...form, rating: e.target.value })
+                }
+                className="border p-2 rounded"
+              >
+                {[5, 4, 3, 2, 1].map((r) => (
+                  <option key={r}>{r}</option>
+                ))}
+              </select>
+
+              <textarea
+                placeholder="Write your review..."
+                value={form.comment}
+                onChange={(e) =>
+                  setForm({ ...form, comment: e.target.value })
+                }
+                className="w-full border p-2 rounded"
+              />
+
+              <button
+                onClick={handleReview}
+                className="bg-green-500 text-white px-4 py-1 rounded"
+              >
+                Submit Review
+              </button>
+
+            </div>
+
+            {/* Review List */}
+            {productReviews.map((r) => (
+              <div key={r.id} className="border p-3 rounded mb-2">
+
+                <p className="text-yellow-500">
+                  {"⭐".repeat(r.rating)}
+                </p>
+
+                <p>{r.comment}</p>
+
+                <button
+                  onClick={() => {
+                    deleteReview(r.id);
+                    setReviews(getReviews());
+                  }}
+                  className="text-red-500 text-sm mt-1"
+                >
+                  Delete
+                </button>
+
+              </div>
+            ))}
+
+          </div>
+
         </div>
 
       </div>

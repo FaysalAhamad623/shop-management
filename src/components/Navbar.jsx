@@ -7,8 +7,8 @@ import { getNotifications } from "../store/notificationStore";
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
-const [show, setShow] = useState(false);
-const notifications = getNotifications();
+  const [show, setShow] = useState(false);
+  const notifications = getNotifications();
   const navigate = useNavigate();
 
   // 🔥 Context cart
@@ -60,29 +60,29 @@ const notifications = getNotifications();
           </div>
           <div className="relative">
 
-  <button onClick={() => setShow(!show)}>
-    🔔
-  </button>
+            <button onClick={() => setShow(!show)}>
+              🔔
+            </button>
 
-  {notifications.length > 0 && (
-    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1 rounded">
-      {notifications.length}
-    </span>
-  )}
+            {notifications.length > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1 rounded">
+                {notifications.length}
+              </span>
+            )}
 
-  {show && (
-    <div className="absolute right-0 mt-2 w-64 bg-white shadow rounded p-3 z-50">
-      <h3 className="font-bold mb-2">Notifications</h3>
+            {show && (
+              <div className="absolute right-0 mt-2 w-64 bg-white shadow rounded p-3 z-50">
+                <h3 className="font-bold mb-2">Notifications</h3>
 
-      {notifications.map((n) => (
-        <div key={n.id} className="text-sm border-b py-1">
-          {n.message}
-        </div>
-      ))}
-    </div>
-  )}
+                {notifications.map((n) => (
+                  <div key={n.id} className="text-sm border-b py-1">
+                    {n.message}
+                  </div>
+                ))}
+              </div>
+            )}
 
-</div>
+          </div>
 
           {/* 👤 User */}
           <User
