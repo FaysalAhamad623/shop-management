@@ -3,123 +3,138 @@ import { Link, useNavigate } from "react-router-dom";
 import { ShoppingCart, User, Menu, X } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { getNotifications } from "../store/notificationStore";
+import CartDrawer from "./CartDrawer";
 
 export default function Navbar() {
+
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [show, setShow] = useState(false);
+  const [openCart, setOpenCart] = useState(false);
+
   const notifications = getNotifications();
   const navigate = useNavigate();
-
-  // 🔥 Context cart
   const { cart } = useCart();
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50">
+    <>
+      <nav className="bg-white shadow-md sticky top-0 z-50">
 
-      <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
+        <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
 
-        {/* 🔥 Logo */}
-        <Link to="/home" className="text-2xl font-bold text-blue-600">
-          ShopX
-        </Link>
+          {/* 🔥 Logo */}
+          <Link to="/home" className="text-2xl font-bold text-blue-600">
+            ShopX
+          </Link>
 
-        {/* 🔥 Desktop Menu */}
-        <div className="hidden md:flex items-center gap-6">
+          {/* 🔥 Desktop */}
+          <div className="hidden md:flex items-center gap-6">
 
-          <Link to="/home" className="hover:text-blue-500">Shop</Link>
-          <Link to="/cart" className="hover:text-blue-500">Cart</Link>
-          <Link to="/my-orders" className="hover:text-blue-500">Orders</Link>
-          <Link to="/profile" className="hover:text-blue-500">Profile</Link>
-          <Link to="/wishlist" className="hover:text-blue-500">Wishlist</Link>
+            <Link to="/home">Shop</Link>
+            <Link to="/my-orders">Orders</Link>
+            <Link to="/wishlist">Wishlist</Link>
 
-          {/* 🔍 Search */}
-          <input
-            type="text"
-            placeholder="Search..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                navigate(`/search?q=${search}`);
-              }
-            }}
-            className="border px-3 py-1 rounded-lg"
-          />
+            {/* 🔍 Search */}
+            <input
+              type="text"
+              placeholder="Search..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  navigate(`/search?q=${search}`);
+                }
+              }}
+              className="border px-3 py-1 rounded-lg"
+            />
 
-        <div
-  id="cart-icon"   // 🔥 THIS LINE ADD
-  onClick={() => navigate("/cart")}
-  className="relative cursor-pointer"
->
-  <ShoppingCart size={22} />
+            {/* 🛒 Cart */}
+            <div
+              id="cart-icon"
+              onClick={() => setOpenCart(true)}
+              className="relative cursor-pointer hover:scale-110 transition"
+            >
+              <ShoppingCart size={22} />
 
-  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1 rounded-full">
-    {cart.length}
-  </span>
-</div>
-          <div className="relative">
+              {cart.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1 rounded-full">
+                  {cart.length}
+                </span>
+              )}
+            </div>
 
-            <button onClick={() => setShow(!show)}>
-              🔔
-            </button>
+            {/* 🔔 Notifications */}
+            <div className="relative">
+              <button onClick={() => setShow(!show)}>🔔</button>
 
-            {notifications.length > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1 rounded">
-                {notifications.length}
-              </span>
-            )}
+              {notifications.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1 rounded">
+                  {notifications.length}
+                </span>
+              )}
 
-            {show && (
-              <div className="absolute right-0 mt-2 w-64 bg-white shadow rounded p-3 z-50">
-                <h3 className="font-bold mb-2">Notifications</h3>
+              {show && (
+                <div className="absolute right-0 mt-2 w-64 bg-white shadow rounded p-3 z-50">
+                  <h3 className="font-bold mb-2">Notifications</h3>
 
-                {notifications.map((n) => (
-                  <div key={n.id} className="text-sm border-b py-1">
-                    {n.message}
-                  </div>
-                ))}
-              </div>
-            )}
+                  {notifications.length === 0 ? (
+                    <p className="text-sm">No notifications</p>
+                  ) : (
+                    notifications.map((n) => (
+                      <div key={n.id} className="text-sm border-b py-1">
+                        {n.message}
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* 👤 Profile */}
+            <User
+              size={22}
+              className="cursor-pointer hover:scale-110 transition"
+              onClick={() => navigate("/profile")}
+            />
 
           </div>
 
-          {/* 👤 User */}
-          <User
-            size={22}
-            className="cursor-pointer"
-            onClick={() => navigate("/profile")}
-          />
+          {/* 📱 Mobile Button */}
+          <div className="md:hidden">
+            {open ? (
+              <X size={28} onClick={() => setOpen(false)} />
+            ) : (
+              <Menu size={28} onClick={() => setOpen(true)} />
+            )}
+          </div>
 
         </div>
 
-        {/* 📱 Mobile Menu Button */}
-        <div className="md:hidden">
-          {open ? (
-            <X size={28} onClick={() => setOpen(false)} />
-          ) : (
-            <Menu size={28} onClick={() => setOpen(true)} />
-          )}
-        </div>
+        {/* 📱 Mobile Menu */}
+        {open && (
+          <div className="md:hidden bg-white px-6 pb-4 space-y-3">
+            <Link to="/home">Shop</Link>
+            <Link to="/my-orders">Orders</Link>
 
-      </div>
+            <input
+              type="text"
+              placeholder="Search..."
+              className="border px-3 py-1 rounded-lg w-full"
+            />
 
-      {/* 📱 Mobile Menu */}
-      {open && (
-        <div className="md:hidden bg-white px-6 pb-4 space-y-3">
+            <button
+              onClick={() => setOpenCart(true)}
+              className="flex items-center gap-2"
+            >
+              🛒 Cart ({cart.length})
+            </button>
+          </div>
+        )}
 
-          <Link to="/home" className="block">Shop</Link>
-          <Link to="/cart" className="block">Cart</Link>
+      </nav>
 
-          <input
-            type="text"
-            placeholder="Search..."
-            className="border px-3 py-1 rounded-lg w-full"
-          />
-
-        </div>
-      )}
-
-    </nav>
+      {/* 🔥 IMPORTANT: Drawer render here */}
+      <CartDrawer open={openCart} setOpen={setOpenCart} />
+    </>
   );
 }
