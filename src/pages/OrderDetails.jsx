@@ -20,50 +20,101 @@ export default function OrderDetails() {
   if (!order) return <p className="p-6">Order not found ❌</p>;
 
   // 🔥 DOWNLOAD PDF (FINAL FIXED)
-  const downloadInvoice = () => {
-    try {
-      const pdf = new jsPDF();
+const downloadInvoice = () => {
+  try {
+    const pdf = new jsPDF();
 
-      // 🔥 HEADER
-      pdf.setFontSize(18);
-      pdf.text("ShopX Invoice", 10, 15);
+    // 📏 layout helpers
+    const startX = 10;
+    let y = 15;
+    const lineGap = 8;
 
-      pdf.setFontSize(12);
-      pdf.text(`Order ID: ${order.id}`, 10, 30);
-      pdf.text(`Date: ${order.date}`, 10, 38);
-      pdf.text(`Status: ${order.status}`, 10, 46);
+    // 🔷 HEADER BOX
+    pdf.setDrawColor(0);
+    pdf.rect(10, 10, 190, 25); // outer header box
 
-      // 🔥 CUSTOMER
-      pdf.text(`Customer: ${order.name}`, 10, 60);
-      pdf.text(`Phone: ${order.phone}`, 10, 68);
+    // 🔷 TITLE
+    pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(0, 102, 204);
+    pdf.setFontSize(18);
+    pdf.text("ShopX Invoice", 12, 20);
 
-      // 🔥 ITEMS HEADER
-      pdf.text("Item", 10, 85);
-      pdf.text("Qty", 100, 85);
-      pdf.text("Price", 150, 85);
+    // 🔷 ORDER INFO (right side)
+    pdf.setFontSize(10);
+    pdf.setTextColor(0, 0, 0);
+    pdf.setFont("helvetica", "normal");
 
-      let y = 95;
+    pdf.text(`Order ID: ${order.id}`, 140, 18);
+    pdf.text(`Date: ${order.date}`, 140, 24);
+    pdf.text(`Status: ${order.status}`, 140, 30);
 
-      // 🔥 ITEMS LOOP
-      order.items.forEach((item) => {
-        pdf.text(item.name, 10, y);
-        pdf.text(String(item.quantity), 100, y);
-        pdf.text(`$${item.price * item.quantity}`, 150, y);
-        y += 10;
-      });
+    y = 45;
 
-      // 🔥 TOTAL
-      pdf.setFontSize(14);
-      pdf.text(`Total: $${order.total}`, 10, y + 10);
+    // 🔷 CUSTOMER BOX
+    pdf.rect(10, y, 190, 20);
+    pdf.setFont("helvetica", "bold");
+    pdf.text("Customer Info", 12, y + 6);
 
-      pdf.save(`Invoice-${order.id}.pdf`);
+    pdf.setFont("helvetica", "normal");
+    pdf.text(`Name: ${order.name}`, 12, y + 12);
+    pdf.text(`Phone: ${order.phone}`, 12, y + 18);
 
-      console.log("PDF SUCCESS ✅");
+    y += 30;
 
-    } catch (err) {
-      console.log("PDF ERROR:", err);
-    }
-  };
+    // 🔷 TABLE HEADER
+    pdf.setFont("helvetica", "bold");
+    pdf.setFillColor(240, 240, 240);
+    pdf.rect(10, y, 190, 10, "F"); // header background
+
+    pdf.text("Item", 12, y + 7);
+    pdf.text("Qty", 110, y + 7);
+    pdf.text("Price", 160, y + 7);
+
+    y += 10;
+
+    // 🔷 TABLE BODY
+    pdf.setFont("helvetica", "normal");
+
+    order.items.forEach((item, index) => {
+
+      // row border
+      pdf.rect(10, y, 190, 10);
+
+      pdf.text(item.name, 12, y + 7);
+      pdf.text(String(item.quantity), 110, y + 7);
+      pdf.text(`$${item.price * item.quantity}`, 160, y + 7);
+
+      y += 10;
+
+      // 🔥 page break
+      if (y > 270) {
+        pdf.addPage();
+        y = 20;
+      }
+    });
+
+    // 🔷 TOTAL BOX
+    y += 5;
+    pdf.setFont("helvetica", "bold");
+    pdf.rect(120, y, 80, 12);
+
+    pdf.text(`Total: $${order.total}`, 130, y + 8);
+
+    // 🔷 FOOTER
+    y += 20;
+    pdf.setFontSize(10);
+    pdf.setTextColor(100);
+    pdf.text("Thank you for shopping with ShopX 💚", 10, y);
+
+    // 🔥 SAVE
+    pdf.save(`Invoice-${order.id}.pdf`);
+
+    console.log("PRO PDF DONE ✅");
+
+  } catch (err) {
+    console.log("PDF ERROR:", err);
+  }
+};
 
   return (
     <div style={{ backgroundColor: "#f3f4f6", minHeight: "100vh", padding: "24px" }}>
