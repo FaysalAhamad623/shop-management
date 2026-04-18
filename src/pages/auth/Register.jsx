@@ -9,7 +9,7 @@ export default function Register() {
     name: "",
     email: "",
     password: "",
-    role: "user",
+    adminCode: "",
   });
 
   const handleSubmit = (e) => {
@@ -17,20 +17,32 @@ export default function Register() {
 
     const users = JSON.parse(localStorage.getItem("users")) || [];
 
-    // 🔥 Check duplicate
+    // 🔥 duplicate check
     const exist = users.find((u) => u.email === form.email);
     if (exist) {
-      alert("User already exists!");
+      alert("User already exists ❌");
       return;
     }
 
-    // 🔥 Save user
-    users.push(form);
+    const ADMIN_SECRET = "1234admin";
+
+    // 🔥 role assign
+    const newUser = {
+      id: Date.now(),
+      name: form.name,
+      email: form.email,
+      password: form.password,
+      role:
+        form.adminCode === ADMIN_SECRET
+          ? "admin"
+          : "user",
+    };
+
+    users.push(newUser);
     localStorage.setItem("users", JSON.stringify(users));
 
     alert("Account created successfully 🎉");
-
-    navigate("/"); // back to login
+    navigate("/");
   };
 
   return (
@@ -47,7 +59,7 @@ export default function Register() {
           <input
             type="text"
             placeholder="Full Name"
-            className="w-full p-2 rounded bg-white/30 placeholder-white outline-none"
+            className="w-full p-2 rounded bg-white/30 outline-none"
             onChange={(e) =>
               setForm({ ...form, name: e.target.value })
             }
@@ -56,7 +68,7 @@ export default function Register() {
           <input
             type="email"
             placeholder="Email"
-            className="w-full p-2 rounded bg-white/30 placeholder-white outline-none"
+            className="w-full p-2 rounded bg-white/30 outline-none"
             onChange={(e) =>
               setForm({ ...form, email: e.target.value })
             }
@@ -65,48 +77,28 @@ export default function Register() {
           <input
             type="password"
             placeholder="Password"
-            className="w-full p-2 rounded bg-white/30 placeholder-white outline-none"
+            className="w-full p-2 rounded bg-white/30 outline-none"
             onChange={(e) =>
               setForm({ ...form, password: e.target.value })
             }
           />
 
-          {/* 🔥 Role Select */}
-          <div className="flex justify-between">
+          {/* 🔐 Admin Code */}
+          <input
+            type="text"
+            placeholder="Admin Code (optional)"
+            className="w-full p-2 rounded bg-white/30 outline-none"
+            onChange={(e) =>
+              setForm({ ...form, adminCode: e.target.value })
+            }
+          />
 
-            <button
-              type="button"
-              onClick={() => setForm({ ...form, role: "user" })}
-              className={`w-1/2 mr-2 py-2 rounded ${
-                form.role === "user"
-                  ? "bg-blue-500"
-                  : "bg-white/30"
-              }`}
-            >
-              User
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setForm({ ...form, role: "admin" })}
-              className={`w-1/2 py-2 rounded ${
-                form.role === "admin"
-                  ? "bg-purple-500"
-                  : "bg-white/30"
-              }`}
-            >
-              Admin
-            </button>
-
-          </div>
-
-          <button className="w-full bg-black py-2 rounded hover:bg-gray-800 transition">
+          <button className="w-full bg-black py-2 rounded">
             Register
           </button>
 
         </form>
 
-        {/* 🔗 Login link */}
         <p className="text-sm mt-4 text-center">
           Already have an account?{" "}
           <span
