@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useCart } from "../../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../../context/ToastContext";
-import { saveOrder } from "../../store/orderStore";
+import { addOrder } from "../../store/orderStore"; // 🔥 only this
 
 export default function Checkout() {
 
@@ -24,7 +24,7 @@ export default function Checkout() {
     0
   );
 
-  // 🔥 Place Order
+  // 🔥 Place Order (open modal)
   const handleOrder = () => {
     if (!form.name || !form.phone || !form.address) {
       showToast("Please fill all fields ❌", "error");
@@ -39,24 +39,19 @@ export default function Checkout() {
     setShowModal(true);
   };
 
-  // 🔥 Confirm Order
+  // 🔥 FINAL CONFIRM ORDER (MAIN FIX HERE)
   const confirmOrder = () => {
 
     const newOrder = {
-      id: Date.now(),
-      items: cart,
-      total: total,
-      status: "Pending",
-      date: new Date().toLocaleString(),
-
-      // 🔥 ADD THESE
       name: form.name,
       phone: form.phone,
-      email: form.email || "N/A",
+      address: form.address,
+      items: cart,
+      total: total,
     };
 
-
-    saveOrder(newOrder);
+    // 🔥 IMPORTANT: use addOrder (NOT saveOrder)
+    addOrder(newOrder);
 
     clearCart();
     setShowModal(false);
@@ -69,18 +64,14 @@ export default function Checkout() {
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
 
-      <h1 className="text-3xl font-bold mb-6">
-        🧾 Checkout
-      </h1>
+      <h1 className="text-3xl font-bold mb-6">🧾 Checkout</h1>
 
       <div className="grid grid-cols-3 gap-6">
 
-        {/* 🧍 Form */}
+        {/* FORM */}
         <div className="col-span-2 bg-white p-6 rounded-xl shadow">
 
-          <h2 className="text-xl font-bold mb-4">
-            Customer Info
-          </h2>
+          <h2 className="text-xl font-bold mb-4">Customer Info</h2>
 
           <div className="space-y-4">
 
@@ -113,7 +104,7 @@ export default function Checkout() {
               }
             />
 
-            {/* 💳 Payment Method */}
+            {/* PAYMENT */}
             <div>
               <p className="mb-2 font-semibold">Payment Method</p>
 
@@ -121,30 +112,33 @@ export default function Checkout() {
 
                 <button
                   onClick={() => setForm({ ...form, payment: "cash" })}
-                  className={`px-4 py-2 rounded ${form.payment === "cash"
+                  className={`px-4 py-2 rounded ${
+                    form.payment === "cash"
                       ? "bg-green-500 text-white"
                       : "bg-gray-200"
-                    }`}
+                  }`}
                 >
                   Cash
                 </button>
 
                 <button
                   onClick={() => setForm({ ...form, payment: "bkash" })}
-                  className={`px-4 py-2 rounded ${form.payment === "bkash"
+                  className={`px-4 py-2 rounded ${
+                    form.payment === "bkash"
                       ? "bg-pink-500 text-white"
                       : "bg-gray-200"
-                    }`}
+                  }`}
                 >
                   bKash
                 </button>
 
                 <button
                   onClick={() => setForm({ ...form, payment: "card" })}
-                  className={`px-4 py-2 rounded ${form.payment === "card"
+                  className={`px-4 py-2 rounded ${
+                    form.payment === "card"
                       ? "bg-blue-500 text-white"
                       : "bg-gray-200"
-                    }`}
+                  }`}
                 >
                   Card
                 </button>
@@ -152,53 +146,14 @@ export default function Checkout() {
               </div>
             </div>
 
-            {/* 🔥 bKash */}
-            {form.payment === "bkash" && (
-              <div className="mt-3">
-                <input
-                  type="text"
-                  placeholder="bKash Number"
-                  className="w-full border p-2 rounded mb-2"
-                />
-                <input
-                  type="text"
-                  placeholder="Transaction ID"
-                  className="w-full border p-2 rounded"
-                />
-              </div>
-            )}
-
-            {/* 🔥 Card */}
-            {form.payment === "card" && (
-              <div className="mt-3 space-y-2">
-                <input
-                  type="text"
-                  placeholder="Card Number"
-                  className="w-full border p-2 rounded"
-                />
-                <input
-                  type="text"
-                  placeholder="MM/YY"
-                  className="w-full border p-2 rounded"
-                />
-                <input
-                  type="text"
-                  placeholder="CVV"
-                  className="w-full border p-2 rounded"
-                />
-              </div>
-            )}
-
           </div>
 
         </div>
 
-        {/* 💰 Summary */}
+        {/* SUMMARY */}
         <div className="bg-white p-6 rounded-xl shadow h-fit">
 
-          <h2 className="text-xl font-bold mb-4">
-            Order Summary
-          </h2>
+          <h2 className="text-xl font-bold mb-4">Order Summary</h2>
 
           {cart.map((item) => (
             <div key={item.id} className="flex justify-between mb-2">
@@ -215,7 +170,7 @@ export default function Checkout() {
 
           <button
             onClick={handleOrder}
-            className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+            className="w-full bg-blue-500 text-white py-2 rounded"
           >
             Place Order
           </button>
@@ -224,21 +179,19 @@ export default function Checkout() {
 
       </div>
 
-      {/* 🔥 MODAL */}
+      {/* MODAL */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
 
-          <div className="bg-white p-6 rounded-xl shadow-lg w-[300px] text-center">
+          <div className="bg-white p-6 rounded-xl text-center">
 
-            <h2 className="text-xl font-bold mb-3">
-              Confirm Order
-            </h2>
+            <h2 className="text-xl font-bold mb-3">Confirm Order</h2>
 
-            <p className="text-gray-600 mb-4">
+            <p className="mb-4">
               Confirm payment via {form.payment.toUpperCase()}?
             </p>
 
-            <div className="flex justify-center gap-4">
+            <div className="flex gap-4 justify-center">
 
               <button
                 onClick={confirmOrder}

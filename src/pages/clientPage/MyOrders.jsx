@@ -1,16 +1,21 @@
 import { useEffect, useState } from "react";
 import { getOrders } from "../../store/orderStore";
-import { useNavigate } from "react-router-dom";
 
 export default function MyOrders() {
 
   const [orders, setOrders] = useState([]);
-  const navigate = useNavigate();
 
   useEffect(() => {
-    const data = getOrders();
-    console.log("ORDERS:", data);
-    setOrders(data);
+    const allOrders = getOrders();
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+    if (!currentUser) return;
+
+    const userOrders = allOrders.filter(
+      (o) => o.userEmail === currentUser.email
+    );
+
+    setOrders(userOrders);
   }, []);
 
   return (
@@ -26,48 +31,11 @@ export default function MyOrders() {
         <div className="space-y-4">
 
           {orders.map((order) => (
-            <div
-              key={order.id}
-              onClick={() => navigate(`/order/${order.id}`)} // 🔥 ADD THIS
-              className="bg-white p-5 rounded-xl shadow border-l-4 border-green-500 cursor-pointer hover:bg-gray-50 transition"
-            >
-
-              <div className="flex justify-between">
-                <div>
-                  <p className="text-sm text-gray-500">
-                    Order ID: #{order.id}
-                  </p>
-                  <p className="font-bold">
-                    {order.date}
-                  </p>
-                </div>
-
-                <span className="bg-yellow-200 text-yellow-800 px-3 py-1 rounded-full text-sm">
-                  {order.status}
-                </span>
-              </div>
-
-              <div className="mt-3">
-                {order.items.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex justify-between text-sm"
-                  >
-                    <span>
-                      {item.name} x{item.quantity}
-                    </span>
-                    <span>
-                      ${item.price * item.quantity}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex justify-between mt-3 font-bold text-green-600">
-                <span>Total:</span>
-                <span>${order.total}</span>
-              </div>
-
+            <div key={order.id} className="bg-white p-5 rounded-xl shadow">
+              <p><b>ID:</b> #{order.id}</p>
+              <p><b>Date:</b> {order.date}</p>
+              <p><b>Status:</b> {order.status}</p>
+              <p><b>Total:</b> ${order.total}</p>
             </div>
           ))}
 
