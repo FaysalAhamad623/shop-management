@@ -195,14 +195,14 @@ export default function Checkout() {
 
               <button
                 onClick={confirmOrder}
-                className="bg-green-500 text-white px-4 py-1 rounded"
+                className="bg-green-600 text-white px-4 py-1 rounded"
               >
                 Confirm
               </button>
 
               <button
                 onClick={() => setShowModal(false)}
-                className="bg-gray-300 px-4 py-1 rounded"
+                className="bg-gray-400 px-4 py-1 rounded"
               >
                 Cancel
               </button>
