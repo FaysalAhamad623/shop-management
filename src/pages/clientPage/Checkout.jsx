@@ -3,6 +3,8 @@ import { useCart } from "../../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../../context/ToastContext";
 import { addOrder } from "../../store/orderStore"; // 🔥 only this
+import { getProfile } from "../../store/profileStore";
+  import { useEffect } from "react";
 
 export default function Checkout() {
 
@@ -18,6 +20,17 @@ export default function Checkout() {
     address: "",
     payment: "cash",
   });
+
+useEffect(() => {
+  const user = getProfile();
+
+  setForm((prev) => ({
+    ...prev,
+    name: user.name || "",
+    phone: user.phone || "",
+    address: user.address || "",
+  }));
+}, []);
 
   const total = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,

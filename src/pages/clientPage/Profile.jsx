@@ -1,158 +1,73 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { getProfile, updateProfile } from "../../store/profileStore";
 
 export default function Profile() {
 
-  const navigate = useNavigate();
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    address: "",
+  });
 
-  const [user, setUser] = useState(null);
-  const [edit, setEdit] = useState(false);
-
-  // 🔥 Load user
   useEffect(() => {
-    const current = JSON.parse(localStorage.getItem("currentUser"));
-    setUser(current);
+    const user = getProfile();
+
+    setForm({
+      name: user.name || "",
+      phone: user.phone || "",
+      address: user.address || "",
+    });
   }, []);
 
   const handleSave = () => {
-    let users = JSON.parse(localStorage.getItem("users")) || [];
-
-    users = users.map((u) =>
-      u.email === user.email ? user : u
-    );
-
-    localStorage.setItem("users", JSON.stringify(users));
-    localStorage.setItem("currentUser", JSON.stringify(user));
-
+    updateProfile(form);
     alert("Profile updated ✅");
-    setEdit(false);
   };
-
-  const handleLogout = () => {
-    localStorage.removeItem("currentUser");
-    navigate("/");
-  };
-
-  if (!user) return <p className="p-6">Loading...</p>;
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen flex justify-center">
+    <div className="p-6 max-w-md mx-auto">
 
-      <div className="bg-white p-6 rounded-xl shadow w-[420px]">
+      <h1 className="text-2xl font-bold mb-4">
+        👤 Profile
+      </h1>
 
-        <h1 className="text-2xl font-bold mb-4 text-center">
-          👤 Profile
-        </h1>
+      <div className="space-y-3">
 
-        {/* 🔥 Name */}
-        <div className="mb-3">
-          <label className="text-sm">Name</label>
-          <input
-            type="text"
-            value={user.name}
-            disabled={!edit}
-            onChange={(e) =>
-              setUser({ ...user, name: e.target.value })
-            }
-            className="w-full border p-2 rounded"
-          />
-        </div>
+        <input
+          type="text"
+          placeholder="Name"
+          className="w-full border p-2 rounded"
+          value={form.name}
+          onChange={(e) =>
+            setForm({ ...form, name: e.target.value })
+          }
+        />
 
-        {/* 🔥 Email */}
-        <div className="mb-3">
-          <label className="text-sm">Email</label>
-          <input
-            type="text"
-            value={user.email}
-            disabled
-            className="w-full border p-2 rounded bg-gray-100"
-          />
-        </div>
+        <input
+          type="text"
+          placeholder="Phone"
+          className="w-full border p-2 rounded"
+          value={form.phone}
+          onChange={(e) =>
+            setForm({ ...form, phone: e.target.value })
+          }
+        />
 
-        {/* 🔥 Role */}
-        <div className="mb-4">
-          <label className="text-sm">Role</label>
-          <input
-            type="text"
-            value={user.role}
-            disabled
-            className="w-full border p-2 rounded bg-gray-100"
-          />
-        </div>
+        <textarea
+          placeholder="Address"
+          className="w-full border p-2 rounded"
+          value={form.address}
+          onChange={(e) =>
+            setForm({ ...form, address: e.target.value })
+          }
+        />
 
-        {/* 🔥 ROLE BASED OPTIONS */}
-        <div className="mb-4 space-y-2">
-
-          {user.role === "admin" ? (
-            <>
-              <button
-                onClick={() => navigate("/dashboard")}
-                className="w-full bg-purple-500 text-white py-2 rounded"
-              >
-                Go to Dashboard
-              </button>
-
-              <button
-                onClick={() => navigate("/products")}
-                className="w-full bg-blue-500 text-white py-2 rounded"
-              >
-                Manage Products
-              </button>
-
-              <button
-                onClick={() => navigate("/orders")}
-                className="w-full bg-green-500 text-white py-2 rounded"
-              >
-                Manage Orders
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={() => navigate("/my-orders")}
-                className="w-full bg-green-500 text-white py-2 rounded"
-              >
-                My Orders
-              </button>
-
-              <button
-                onClick={() => navigate("/cart")}
-                className="w-full bg-blue-500 text-white py-2 rounded"
-              >
-                Go to Cart
-              </button>
-            </>
-          )}
-
-        </div>
-
-        {/* 🔥 Buttons */}
-        <div className="flex justify-between">
-
-          {edit ? (
-            <button
-              onClick={handleSave}
-              className="bg-green-500 text-white px-4 py-1 rounded"
-            >
-              Save
-            </button>
-          ) : (
-            <button
-              onClick={() => setEdit(true)}
-              className="bg-blue-500 text-white px-4 py-1 rounded"
-            >
-              Edit
-            </button>
-          )}
-
-          <button
-            onClick={handleLogout}
-            className="bg-red-500 text-white px-4 py-1 rounded"
-          >
-            Logout
-          </button>
-
-        </div>
+        <button
+          onClick={handleSave}
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+        >
+          Save
+        </button>
 
       </div>
 
