@@ -5,6 +5,8 @@ import { useToast } from "../../context/ToastContext";
 import { addOrder } from "../../store/orderStore"; // 🔥 only this
 import { getProfile } from "../../store/profileStore";
   import { useEffect } from "react";
+  import { getDefaultAddress } from "../../store/profileStore";
+
 
 export default function Checkout() {
 
@@ -22,14 +24,17 @@ export default function Checkout() {
   });
 
 useEffect(() => {
-  const user = getProfile();
+  const user = JSON.parse(localStorage.getItem("currentUser"));
+  const address = getDefaultAddress();
 
-  setForm((prev) => ({
-    ...prev,
-    name: user.name || "",
-    phone: user.phone || "",
-    address: user.address || "",
-  }));
+  if (user && address) {
+    setForm((prev) => ({
+      ...prev,
+      name: user.name,
+      phone: user.phone,
+      address: address.address,
+    }));
+  }
 }, []);
 
   const total = cart.reduce(
